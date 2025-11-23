@@ -1,0 +1,41 @@
+/* Navbar.module.css */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(90deg, #93cf61, #a8e07f);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.links {
+  display: flex;
+  gap: 1rem;
+}
+
+.links a {
+  color: white;
+  background: rgba(90, 146, 45, 0.8);
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.links a:hover {
+  background: rgba(70, 114, 34, 0.9);
+  transform: translateY(-2px);
+}
+
+.user {
+  background: rgba(18, 39, 0, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  color: #ffffff;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+}

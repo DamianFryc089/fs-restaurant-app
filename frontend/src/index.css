@@ -1,0 +1,109 @@
+body {
+  margin: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background: linear-gradient(135deg, #d8ffce, #b7f8ff);
+  min-height: 100vh;
+}
+
+.main-content {
+  padding: 2rem;
+}
+
+.page {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.subpage {
+  flex: 1;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    inset 0 0 20px rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
+  box-sizing: border-box;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  border: #d6d6d6 1px solid;
+  align-items: center;
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.1),
+    inset 0 0 10px rgba(255, 255, 255, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.12),
+    inset 0 0 12px rgba(255, 255, 255, 0.5);
+}
+
+.card button {
+  margin-right: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #5aa75a;
+  border-radius: 8px;
+  background-color: #cbffcb;
+  transition: margin 0.5s ease, padding 0.5s ease, background-color 0.5s ease, border 0.5s ease;
+}
+
+.card button:hover {
+  background-color: #8aff8a;
+  border: 1px solid #66cc66;
+  cursor: pointer;
+  /* padding: 0.6rem 1.2rem; */
+}
+
+.card input {
+  width: 70px;
+  padding: 0.3rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-right: 0.5rem;
+  background: #ffffffbb;
+  box-sizing: border-box;
+}
+
+.card-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+.card-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #024900;
+}
+a:hover {
+  color: #000000;
+}
+
+.completed {
+  background: #efffec;
+}
+
+.cancelled {
+  background: #ececec;
+}
+
+.pending {
+  background: #faffeb;
+}

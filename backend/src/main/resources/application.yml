@@ -1,0 +1,22 @@
+spring:
+    application:
+        name: bazy_danych_projekt
+
+    datasource:
+        url: ${DB_URL}/bazy
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: false
+        properties:
+            hibernate:
+                format_sql: true
+#    sql:
+#        init:
+#            mode: always
+jwt:
+    secret: ${JWT_SECRET}
+    expiration: 3600000
