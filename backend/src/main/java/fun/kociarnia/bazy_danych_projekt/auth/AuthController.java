@@ -19,7 +19,7 @@ import jakarta.servlet.http.Cookie;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/bazy/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthenticationManager authManager;

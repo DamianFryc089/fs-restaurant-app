@@ -28,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
@@ -62,7 +61,7 @@ class UserControllerTest {
 
         when(userService.createUser(any(User.class))).thenReturn(createdUser);
 
-        mockMvc.perform(post("/bazy/users")
+        mockMvc.perform(post("/users")
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                         .content(new ObjectMapper().writeValueAsString(createUserDTO)))
                 .andExpect(status().isOk())

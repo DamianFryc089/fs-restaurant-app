@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bazy/offers")
+@RequestMapping("/offers")
 public class OfferController {
 
     private final OfferService service;
