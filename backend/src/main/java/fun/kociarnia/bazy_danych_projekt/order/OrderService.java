@@ -8,30 +8,32 @@ import fun.kociarnia.bazy_danych_projekt.offer.Offer;
 import fun.kociarnia.bazy_danych_projekt.offer.OfferRepository;
 import fun.kociarnia.bazy_danych_projekt.user.User;
 import fun.kociarnia.bazy_danych_projekt.user.UserRepository;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class OrderService {
 
-    private final OrderRepository repository;
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+
+    private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final OfferRepository offerRepository;
 
-    public OrderService(OrderRepository repository, UserRepository userRepository, OfferRepository offerRepository) {
-        this.repository = repository;
-        this.userRepository = userRepository;
-        this.offerRepository = offerRepository;
-    }
 
     public List<Order> getAllOrders() {
-        return repository.findAll();
+        return orderRepository.findAll();
     }
 
     public Order getOrderById(Long id) {
-        return repository.findById(id)
+        return orderRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order", "id", id));
     }
 
@@ -55,13 +57,11 @@ public class OrderService {
 
         offer.setAvailableQuantity(offer.getAvailableQuantity() - newOrder.getQuantity());
         offerRepository.save(offer);
-        return repository.save(newOrder);
-    }
 
-    public Order updateOrder(Long id, Order updatedOrder) {
-        Order order = getOrderById(id);
-        order.setStatus(updatedOrder.getStatus());
-        return repository.save(order);
+        Order savedOrder = orderRepository.save(newOrder);
+        logger.info("Order created: orderId={}, clientId={}, offerId={}, quantity={}, totalPrice={}",
+                savedOrder.getId(), clientId, offerId, savedOrder.getQuantity(), savedOrder.getTotalPrice());
+        return savedOrder;
     }
 
     public Order completeOrder(Long id, Long employeeId) {
@@ -77,7 +77,10 @@ public class OrderService {
             throw new IllegalOperationException("Cannot complete order from other restaurant");
 
         order.setStatus(Order.Status.COMPLETED);
-        return repository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        logger.info("Order completed: orderId={}, employeeId={}, clientId={}",
+                savedOrder.getId(), employeeId, savedOrder.getClient().getId());
+        return savedOrder;
     }
 
     public Order cancelOrderEmployee(Long id, Long employeeId) {
@@ -98,7 +101,10 @@ public class OrderService {
         offerRepository.save(offer);
 
         order.setStatus(Order.Status.CANCELLED);
-        return repository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        logger.info("Order cancelled by employee: orderId={}, employeeId={}, clientId={}",
+                savedOrder.getId(), employeeId, savedOrder.getClient().getId());
+        return savedOrder;
     }
 
     public Order cancelOrderClient(Long id, Long clientId) {
@@ -115,15 +121,21 @@ public class OrderService {
         offerRepository.save(offer);
 
         order.setStatus(Order.Status.CANCELLED);
-        return repository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        logger.info("Order cancelled by client: orderId={}, clientId={}",
+                savedOrder.getId(), clientId);
+        return savedOrder;
     }
 
     public void deleteOrder(Long id) {
-        repository.deleteById(id);
+        Order order = getOrderById(id);
+        orderRepository.deleteById(id);
+        logger.info("Order deleted: orderId={}, clientId={}, offerId={}",
+                order.getId(), order.getClient().getId(), order.getOffer().getId());
     }
 
     public List<Order> getOrdersByClient(Long clientId) {
-        return repository.findByClientIdOrderByCreatedAtDesc(clientId);
+        return orderRepository.findByClientIdOrderByCreatedAtDesc(clientId);
     }
 
     public List<Order> getOrdersByRestaurant(Long restaurantId, Long employeeId) {
@@ -133,6 +145,6 @@ public class OrderService {
         if (!Objects.equals(employee.getRestaurant().getId(), restaurantId))
             throw new IllegalOperationException("Cannot fetch orders from other restaurant");
 
-        return repository.findByOffer_Restaurant_Id(restaurantId);
+        return orderRepository.findByOffer_Restaurant_Id(restaurantId);
     }
 }

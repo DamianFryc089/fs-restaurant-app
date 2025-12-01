@@ -3,32 +3,37 @@ package fun.kociarnia.bazy_danych_projekt.city;
 
 import fun.kociarnia.bazy_danych_projekt.exception.IllegalOperationException;
 import fun.kociarnia.bazy_danych_projekt.exception.NotFoundException;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class CityService {
 
-    private final CityRepository repository;
+    private static final Logger logger = LoggerFactory.getLogger(CityService.class);
 
-    public CityService(CityRepository repository) {
-        this.repository = repository;
-    }
+    private final CityRepository cityRepository;
 
     public List<City> getAllCities() {
-        return repository.findAll();
+        return cityRepository.findAll();
     }
 
     public City getCityById(Long id) {
-        return repository.findById(id)
+        return cityRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("City", "id", id));
     }
 
     public City createCity(City city) {
-        repository.findByName(city.getName()).ifPresent(existingCity -> {
+        cityRepository.findByName(city.getName()).ifPresent(existingCity -> {
             throw new IllegalOperationException("City name already used.");
         });
-        return repository.save(city);
+
+        City savedCity = cityRepository.save(city);
+        logger.info("City created: cityId={}, name={}", savedCity.getId(), savedCity.getName());
+        return savedCity;
     }
 }

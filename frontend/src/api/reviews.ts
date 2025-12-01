@@ -20,6 +20,12 @@ export const fetchReviewsByUser = async (userId: number,): Promise<Review[]> => 
     return fetchWithAuth(`/reviews/user/${userId}`);
 };
 
-export const fetchReviewsByOrderId = async (orderId: number,): Promise<Review> => {
+export const fetchReviewByOrderId = async (orderId: number,): Promise<Review> => {
     return fetchWithAuth(`/reviews/order/${orderId}`);
+};
+
+export const deleteReview = async (review: Partial<Review>) => {
+    return fetchWithAuth(`/reviews/${review.id}`, {
+        method: "DELETE"
+    });
 };

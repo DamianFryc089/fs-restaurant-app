@@ -7,34 +7,36 @@ import fun.kociarnia.bazy_danych_projekt.restaurant.Restaurant;
 import fun.kociarnia.bazy_danych_projekt.restaurant.RestaurantRepository;
 import fun.kociarnia.bazy_danych_projekt.user.User;
 import fun.kociarnia.bazy_danych_projekt.user.UserRepository;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class OfferService {
 
-    private final OfferRepository repository;
+    private static final Logger logger = LoggerFactory.getLogger(OfferService.class);
+
+    private final OfferRepository offerRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
 
-    public OfferService(OfferRepository repository, RestaurantRepository restaurantRepository, UserRepository userRepository) {
-        this.repository = repository;
-        this.restaurantRepository = restaurantRepository;
-        this.userRepository = userRepository;
-    }
-
     public List<Offer> getOffers() {
-        return repository.findAll();
+        return offerRepository.findAll();
     }
 
     public List<Offer> getOffersByStatus(Offer.Status status) {
-        return repository.findAllByStatus(status);
+        return offerRepository.findAllByStatus(status);
     }
 
     public Offer getOfferById(Long id) {
-        return repository.findById(id)
+        return offerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Offer", "id", id));
     }
 
@@ -45,19 +47,20 @@ public class OfferService {
         if (!Objects.equals(employee.getRestaurant().getId(), restaurantId))
             throw new IllegalOperationException("Cannot create an offer for other restaurant");
 
+        if (offer.getPrice().compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalOperationException("Price of an offer cannot be lower than 0");
+
+        if (offer.getAvailableQuantity() < 1)
+            throw new IllegalOperationException("Available quantity of an offer cannot be lower than 1");
+
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new NotFoundException("Restaurant", "id", restaurantId));
         offer.setRestaurant(restaurant);
-        return repository.save(offer);
-    }
-    public Offer updateOffer(Long id, Offer updatedOffer) {
-        Offer offer = getOfferById(id);
-        offer.setTitle(updatedOffer.getTitle());
-        offer.setDescription(updatedOffer.getDescription());
-        offer.setPrice(updatedOffer.getPrice());
-        offer.setAvailableQuantity(updatedOffer.getAvailableQuantity());
-        offer.setStatus(updatedOffer.getStatus());
-        return repository.save(offer);
+        Offer savedOffer = offerRepository.save(offer);
+        logger.info("Offer created: offerId={}, restaurantId={}, employeeId={}, title={}, price={}, quantity={}",
+                savedOffer.getId(), restaurantId, employeeId, savedOffer.getTitle(),
+                savedOffer.getPrice(), savedOffer.getAvailableQuantity());
+        return savedOffer;
     }
 
     public Offer updateOffer(Long id, Offer updatedOffer, Long restaurantId) {
@@ -70,23 +73,32 @@ public class OfferService {
         offer.setPrice(updatedOffer.getPrice());
         offer.setAvailableQuantity(updatedOffer.getAvailableQuantity());
         offer.setStatus(updatedOffer.getStatus());
-        return repository.save(offer);
+
+        Offer savedOffer = offerRepository.save(offer);
+        logger.info("Offer updated with restaurant change: offerId={}, restaurantId={}, title={}, price={}, quantity={}, status={}",
+                savedOffer.getId(), restaurantId, savedOffer.getTitle(),
+                savedOffer.getPrice(), savedOffer.getAvailableQuantity(),
+                savedOffer.getStatus());
+        return savedOffer;
     }
 
     public void deleteOffer(Long id) {
-        repository.deleteById(id);
+        Offer offer = getOfferById(id);
+        offerRepository.deleteById(id);
+        logger.info("Offer deleted: offerId={}, restaurantId={}, title={}",
+                offer.getId(), offer.getRestaurant().getId(), offer.getTitle());
     }
 
     public List<Offer> getOffersByRestaurant(Long restaurantId) {
-        Optional<List<Offer>> offers = repository.findByRestaurantId(restaurantId);
+        Optional<List<Offer>> offers = offerRepository.findByRestaurantId(restaurantId);
         return offers.orElseGet(List::of);
     }
 
     public List<Offer> getOffersByCityName(String cityName) {
-        return repository.findByRestaurant_City_NameIgnoreCase(cityName);
+        return offerRepository.findByRestaurant_City_NameIgnoreCase(cityName);
     }
     public List<Offer> getOffersByCityId(Long cityId) {
-        return repository.findByRestaurant_City_Id(cityId);
+        return offerRepository.findByRestaurant_City_Id(cityId);
     }
 
 }

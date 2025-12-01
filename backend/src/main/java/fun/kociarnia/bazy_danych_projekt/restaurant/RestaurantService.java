@@ -5,32 +5,33 @@ import fun.kociarnia.bazy_danych_projekt.city.City;
 import fun.kociarnia.bazy_danych_projekt.city.CityRepository;
 import fun.kociarnia.bazy_danych_projekt.exception.NotFoundException;
 import fun.kociarnia.bazy_danych_projekt.exception.ResourceAlreadyExistsException;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class RestaurantService {
 
-    private final RestaurantRepository repository;
+    private static final Logger logger = LoggerFactory.getLogger(RestaurantService.class);
+
+    private final RestaurantRepository restaurantRepository;
     private final CityRepository cityRepository;
 
-    public RestaurantService(RestaurantRepository repository, CityRepository cityRepository) {
-        this.repository = repository;
-        this.cityRepository = cityRepository;
-    }
-
     public List<Restaurant> getAllRestaurants() {
-        return repository.findAll();
+        return restaurantRepository.findAll();
     }
 
     public Restaurant getRestaurantById(Long id) {
-        return repository.findById(id)
+        return restaurantRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Restaurant", "id", id));
     }
 
     public Restaurant createRestaurant(Restaurant restaurant, String cityName) {
-        repository.findByName(restaurant.getName()).ifPresent(existingRestaurant -> {
+        restaurantRepository.findByName(restaurant.getName()).ifPresent(existingRestaurant -> {
             throw new ResourceAlreadyExistsException("Restaurant with name " + restaurant.getName() + " already exists");
         });
         Restaurant newRestaurant = new Restaurant();
@@ -40,7 +41,11 @@ public class RestaurantService {
         City city = cityRepository.findByName(cityName)
                 .orElseThrow(() -> new NotFoundException("City", "name", cityName));
         newRestaurant.setCity(city);
-        return repository.save(newRestaurant);
+
+        Restaurant savedRestaurant = restaurantRepository.save(newRestaurant);
+        logger.info("Restaurant created: id={}, name={}, city={}",
+                savedRestaurant.getId(), savedRestaurant.getName(), cityName);
+        return savedRestaurant;
     }
 
     public Restaurant updateRestaurant(Long id, Restaurant updatedRestaurant, String cityName) {
@@ -51,14 +56,20 @@ public class RestaurantService {
         restaurant.setStreet(updatedRestaurant.getStreet());
         restaurant.setPhone(updatedRestaurant.getPhone());
         restaurant.setCity(city);
-        return repository.save(restaurant);
+
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        logger.info("Restaurant updated: id={}, name={}, city={}",
+                savedRestaurant.getId(), savedRestaurant.getName(), cityName);
+        return savedRestaurant;
     }
 
     public void deleteRestaurant(Long id) {
-        repository.deleteById(id);
+        Restaurant restaurant = getRestaurantById(id);
+        restaurantRepository.deleteById(id);
+        logger.info("Restaurant deleted: id={}, name={}", restaurant.getId(), restaurant.getName());
     }
 
     public List<Restaurant> getRestaurantsByCityId(Long cityId) {
-        return repository.findByCity_Id(cityId);
+        return restaurantRepository.findByCity_Id(cityId);
     }
 }

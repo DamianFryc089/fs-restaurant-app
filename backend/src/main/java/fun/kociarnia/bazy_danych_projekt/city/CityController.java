@@ -2,8 +2,6 @@ package fun.kociarnia.bazy_danych_projekt.city;
 
 
 import fun.kociarnia.bazy_danych_projekt.city.dto.CityDTO;
-import fun.kociarnia.bazy_danych_projekt.offer.Offer;
-import fun.kociarnia.bazy_danych_projekt.offer.dto.OfferDTO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

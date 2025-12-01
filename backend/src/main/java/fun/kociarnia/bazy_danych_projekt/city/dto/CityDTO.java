@@ -2,11 +2,6 @@ package fun.kociarnia.bazy_danych_projekt.city.dto;
 
 
 import fun.kociarnia.bazy_danych_projekt.city.City;
-import fun.kociarnia.bazy_danych_projekt.offer.Offer;
-import fun.kociarnia.bazy_danych_projekt.offer.dto.OfferDTO;
-import fun.kociarnia.bazy_danych_projekt.user.User;
-import fun.kociarnia.bazy_danych_projekt.user.dto.UserDTO;
-import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;

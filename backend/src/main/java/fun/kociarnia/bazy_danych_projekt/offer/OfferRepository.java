@@ -1,7 +1,5 @@
 package fun.kociarnia.bazy_danych_projekt.offer;
 
-import fun.kociarnia.bazy_danych_projekt.order.Order;
-import fun.kociarnia.bazy_danych_projekt.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

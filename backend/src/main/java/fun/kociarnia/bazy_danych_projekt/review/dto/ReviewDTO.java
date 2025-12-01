@@ -1,7 +1,10 @@
 package fun.kociarnia.bazy_danych_projekt.review.dto;
 
 import fun.kociarnia.bazy_danych_projekt.review.Review;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;

@@ -5,9 +5,9 @@ import fun.kociarnia.bazy_danych_projekt.offer.Offer;
 import fun.kociarnia.bazy_danych_projekt.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Data
 @Entity

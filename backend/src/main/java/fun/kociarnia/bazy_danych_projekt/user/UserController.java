@@ -1,12 +1,10 @@
 package fun.kociarnia.bazy_danych_projekt.user;
 
-import fun.kociarnia.bazy_danych_projekt.MyUserDetails;
 import fun.kociarnia.bazy_danych_projekt.city.dto.CityDTO;
 import fun.kociarnia.bazy_danych_projekt.user.dto.CreateUserDTO;
 import fun.kociarnia.bazy_danych_projekt.user.dto.UserDTO;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

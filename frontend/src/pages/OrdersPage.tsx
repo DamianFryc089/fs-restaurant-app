@@ -5,8 +5,8 @@ import { ReviewCard } from "../components/Cards/ReviewCard";
 import { OrderCard } from "../components/Cards/OrderCard";
 import { AuthContext } from "../context/AuthContext";
 import { ReviewForm } from "../components/Forms/ReviewForm";
-import { changeOrderStatus, fetchOrders, fetchOrdersByClient, fetchOrdersByRestaurant } from "../api/orders";
-import { createReview, fetchReviewsByOrderId } from "../api/reviews";
+import { changeOrderStatus, deleteOrder, fetchOrders, fetchOrdersByClient, fetchOrdersByRestaurant } from "../api/orders";
+import { createReview, deleteReview, fetchReviewByOrderId } from "../api/reviews";
 import { ApiStatusDisplay, type ApiError } from "../components/ApiErrorDisplay";
 
 export const OrdersPage: React.FC = () => {
@@ -41,22 +41,22 @@ export const OrdersPage: React.FC = () => {
 		}
 	};
 
-	const handleOnCancel = async (order: Partial<Order>) => {
+	const handleOnOrderCancel = async (order: Partial<Order>) => {
 		order.status = "CANCELED";
 		await changeOrderStatus(order)
 		await loadOrders();
 	}
 
-	const handleOnComplete = async (order: Partial<Order>) => {
+	const handleOnOrderComplete = async (order: Partial<Order>) => {
 		order.status = "COMPLETED";
 		await changeOrderStatus(order)
 		await loadOrders();
 	}
 
-	const handleOnReview = async (order: Partial<Order>) => {
+	const handleOnOrderReview = async (order: Partial<Order>) => {
 		if (!order.id) return;
 		try {
-			const data = await fetchReviewsByOrderId(order.id)
+			const data = await fetchReviewByOrderId(order.id)
 			setReview(data);
 		}
 		catch {
@@ -67,8 +67,14 @@ export const OrdersPage: React.FC = () => {
 		}
 	}
 
-	const handleOnDelete = async (order: Partial<Order>) => {
-		changeOrderStatus(order)
+	const handleOnOrderDelete = async (order: Partial<Order>) => {
+		await deleteOrder(order)
+		await loadOrders();
+	}
+
+	const handleOnReviewDelete = async (review: Partial<Review>) => {
+		await deleteReview(review)
+		await handleOnOrderReview({id: review.orderId});
 	}
 
 	const handleReviewSubmit = async (review: Partial<Review>) => {
@@ -88,12 +94,12 @@ export const OrdersPage: React.FC = () => {
 			<div className="subpage">
 				<h2>Orders</h2>
 				{getOrdersError && <p style={{ color: "red" }}>{getOrdersError}</p>}
-				{orders.map(o => (<OrderCard key={o.id} order={o} onCancel={handleOnCancel} onComplete={handleOnComplete} onDelete={handleOnDelete} onReview={handleOnReview} />))}
+				{orders.map(o => (<OrderCard key={o.id} order={o} onCancel={handleOnOrderCancel} onComplete={handleOnOrderComplete} onDelete={handleOnOrderDelete} onReview={handleOnOrderReview} />))}
 			</div>
 			<div className="subpage">
-				<h2>Review {review && `- ${orders[review.orderId].offerTitle}`} {!review && selectedOrderId && `- ${orders[selectedOrderId].offerTitle}` }  </h2>
-				{review && (<ReviewCard review={review} />)}
-				{!review && selectedOrderId && role == "CLIENT"  && (<>
+				<h2>Review {orders.find(o => o.id === (review?.orderId || selectedOrderId))?.offerTitle || ""}</h2>
+				{review && (<ReviewCard review={review} onDelete={handleOnReviewDelete}/>)}
+				{!review && selectedOrderId && role == "CLIENT" && (<>
 					<ReviewForm orderId={selectedOrderId} onSubmit={handleReviewSubmit} />
 					<ApiStatusDisplay error={createReviewError} success={createReviewSuccess} />
 				</>)}

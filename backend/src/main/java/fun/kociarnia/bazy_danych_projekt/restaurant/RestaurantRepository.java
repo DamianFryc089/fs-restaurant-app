@@ -1,6 +1,5 @@
 package fun.kociarnia.bazy_danych_projekt.restaurant;
 
-import fun.kociarnia.bazy_danych_projekt.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

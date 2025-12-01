@@ -6,32 +6,27 @@ import fun.kociarnia.bazy_danych_projekt.user.User;
 import fun.kociarnia.bazy_danych_projekt.user.UserService;
 import fun.kociarnia.bazy_danych_projekt.user.dto.UserDTO;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.Cookie;
 
 import java.util.Map;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final UserService userService;
-
-    public AuthController(AuthenticationManager authManager, JwtService jwtService, UserService userService) {
-        this.authManager = authManager;
-        this.jwtService = jwtService;
-        this.userService = userService;
-    }
-
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest request, HttpServletResponse response) {

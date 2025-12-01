@@ -5,7 +5,6 @@ import fun.kociarnia.bazy_danych_projekt.order.Order;
 import fun.kociarnia.bazy_danych_projekt.restaurant.Restaurant;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.Check;
 
 import java.time.LocalDateTime;
 import java.util.List;

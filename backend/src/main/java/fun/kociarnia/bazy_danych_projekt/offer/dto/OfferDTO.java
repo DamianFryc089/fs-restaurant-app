@@ -1,17 +1,13 @@
 package fun.kociarnia.bazy_danych_projekt.offer.dto;
 
 
-import fun.kociarnia.bazy_danych_projekt.city.City;
 import fun.kociarnia.bazy_danych_projekt.offer.Offer;
 import fun.kociarnia.bazy_danych_projekt.order.Order;
 import fun.kociarnia.bazy_danych_projekt.review.Review;
-import fun.kociarnia.bazy_danych_projekt.restaurant.Restaurant;
-import fun.kociarnia.bazy_danych_projekt.user.User;
-import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,8 +23,10 @@ public class OfferDTO {
 
     private String description;
 
+    @Min(0)
     private BigDecimal price;
 
+    @Min(0)
     private Integer availableQuantity;
 
     private String status;

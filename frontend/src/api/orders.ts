@@ -25,3 +25,9 @@ export const changeOrderStatus = async (order: Partial<Order>): Promise<Order[]>
         method: "PUT"
     });
 };
+
+export const deleteOrder = async (order: Partial<Order>): Promise<Order[]> => {
+    return fetchWithAuth(`/orders/${order.id}`, {
+        method: "DELETE"
+    });
+};

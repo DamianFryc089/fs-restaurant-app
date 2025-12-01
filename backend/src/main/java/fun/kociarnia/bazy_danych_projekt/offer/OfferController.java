@@ -3,8 +3,6 @@ package fun.kociarnia.bazy_danych_projekt.offer;
 
 import fun.kociarnia.bazy_danych_projekt.MyUserDetails;
 import fun.kociarnia.bazy_danych_projekt.offer.dto.OfferDTO;
-import fun.kociarnia.bazy_danych_projekt.restaurant.Restaurant;
-import fun.kociarnia.bazy_danych_projekt.user.User;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,17 +1,11 @@
 package fun.kociarnia.bazy_danych_projekt.restaurant.dto;
 
 
-import fun.kociarnia.bazy_danych_projekt.city.City;
-import fun.kociarnia.bazy_danych_projekt.offer.Offer;
-import fun.kociarnia.bazy_danych_projekt.offer.dto.OfferDTO;
 import fun.kociarnia.bazy_danych_projekt.restaurant.Restaurant;
-import fun.kociarnia.bazy_danych_projekt.user.User;
-import fun.kociarnia.bazy_danych_projekt.user.dto.UserDTO;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Value;
 
 import java.util.List;
 

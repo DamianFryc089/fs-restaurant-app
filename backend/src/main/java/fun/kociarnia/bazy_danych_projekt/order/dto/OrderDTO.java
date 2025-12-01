@@ -1,13 +1,6 @@
 package fun.kociarnia.bazy_danych_projekt.order.dto;
 
-import fun.kociarnia.bazy_danych_projekt.city.City;
-import fun.kociarnia.bazy_danych_projekt.city.dto.CityDTO;
-import fun.kociarnia.bazy_danych_projekt.offer.Offer;
 import fun.kociarnia.bazy_danych_projekt.order.Order;
-import fun.kociarnia.bazy_danych_projekt.review.Review;
-import fun.kociarnia.bazy_danych_projekt.user.User;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -26,6 +19,7 @@ public class OrderDTO {
 
     private String status = "PENDING";
 
+    @Min(0)
     private BigDecimal totalPrice;
 
     private LocalDateTime createdAt;

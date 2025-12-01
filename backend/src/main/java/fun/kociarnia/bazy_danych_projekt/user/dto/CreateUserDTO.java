@@ -1,8 +1,9 @@
 package fun.kociarnia.bazy_danych_projekt.user.dto;
 
-import fun.kociarnia.bazy_danych_projekt.restaurant.Restaurant;
 import fun.kociarnia.bazy_danych_projekt.user.User;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data

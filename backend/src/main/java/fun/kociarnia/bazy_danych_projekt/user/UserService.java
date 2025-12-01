@@ -3,8 +3,14 @@ package fun.kociarnia.bazy_danych_projekt.user;
 
 import fun.kociarnia.bazy_danych_projekt.city.City;
 import fun.kociarnia.bazy_danych_projekt.city.CityRepository;
-import fun.kociarnia.bazy_danych_projekt.exception.*;
+import fun.kociarnia.bazy_danych_projekt.exception.IllegalOperationException;
+import fun.kociarnia.bazy_danych_projekt.exception.NotFoundException;
+import fun.kociarnia.bazy_danych_projekt.exception.SamePasswordException;
+import fun.kociarnia.bazy_danych_projekt.exception.WeakPasswordException;
 import fun.kociarnia.bazy_danych_projekt.restaurant.RestaurantRepository;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,65 +19,65 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final CityRepository cityRepository;
     private final RestaurantRepository restaurantRepository;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository repository, CityRepository cityRepository, RestaurantRepository restaurantRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.repository = repository;
-        this.cityRepository = cityRepository;
-        this.restaurantRepository = restaurantRepository;
-    }
-
     public User getUserById(Long id) {
-        return repository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User", "id", id));
     }
 
     public User getUserByUsername(String username) {
-        return repository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("User", "username", username));
     }
 
     public User createUser(User user) {
         validatePassword(user.getPassword());
-        User newUser = new User();
         validateUsernameUnique(null, user.getUsername());
+
+        User newUser = new User();
         newUser.setUsername(user.getUsername());
         newUser.setEmail(user.getEmail());
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        if (repository.count() == 0) {
-            newUser.setRole(User.Role.ADMIN); // First user gets admin role
-        }
+        // First user gets admin role
+        if (userRepository.count() == 0) newUser.setRole(User.Role.ADMIN);
 
-        return repository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+        logger.info("New user created: username={}, email={}, role={}",
+                savedUser.getUsername(), savedUser.getEmail(), savedUser.getRole());
+        return savedUser;
     }
 
     public User updateUserSelf(Long id, User user) {
-        User updatedUser = getUserById(id);
-
         validateUsernameUnique(id, user.getUsername());
-        updatedUser.setUsername(user.getUsername());
-
         validateEmailUnique(id, user.getEmail());
-        updatedUser.setEmail(user.getEmail());
 
+        User updatedUser = getUserById(id);
+        updatedUser.setUsername(user.getUsername());
+        updatedUser.setEmail(user.getEmail());
         updatedUser.setUpdatedAt(java.time.LocalDateTime.now());
-        return repository.save(updatedUser);
+
+        User savedUser = userRepository.save(updatedUser);
+        logger.info("User updated self: id={}, username={}, email={}",
+                savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
+        return savedUser;
     }
 
     public User updateUserAdmin(Long id, User user, String cityName, Long restaurantId) {
-        User updatedUser = getUserById(id);
-
         validateUsernameUnique(id, user.getUsername());
-        updatedUser.setUsername(user.getUsername());
-
         validateEmailUnique(id, user.getEmail());
+
+        User updatedUser = getUserById(id);
+        updatedUser.setUsername(user.getUsername());
         updatedUser.setEmail(user.getEmail());
 
         if (updatedUser.getRole() == User.Role.ADMIN && user.getRole() != User.Role.ADMIN)
@@ -89,34 +95,43 @@ public class UserService {
         });
 
         updatedUser.setUpdatedAt(java.time.LocalDateTime.now());
-        return repository.save(updatedUser);
+
+        User savedUser = userRepository.save(updatedUser);
+        logger.info("Admin updated user: id={}, username={}, email={}, role={}, city={}, restaurant={}",
+                savedUser.getId(), savedUser.getUsername(), savedUser.getEmail(),
+                savedUser.getRole(),
+                savedUser.getCity() != null ? savedUser.getCity().getName() : null,
+                savedUser.getRestaurant() != null ? savedUser.getRestaurant().getName() : null);
+        return savedUser;
     }
 
 
     public void deleteUser(Long id) {
-        repository.deleteById(id);
+        User user = getUserById(id);
+        userRepository.deleteById(id);
+        logger.info("User deleted: id={}, username={}, email={}", id, user.getUsername(), user.getEmail());
     }
 
     public User changePassword(Long id, String newPassword) {
-        User updatedUser = getUserById(id);
-
         validatePassword(newPassword);
 
+        User updatedUser = getUserById(id);
         String encodedPassword = passwordEncoder.encode(newPassword);
-
 
         if (updatedUser.getPassword().equals(encodedPassword)) {
             throw new SamePasswordException();
         }
 
-
         updatedUser.setPassword(encodedPassword);
         updatedUser.setUpdatedAt(java.time.LocalDateTime.now());
-        return repository.save(updatedUser);
+
+        User savedUser = userRepository.save(updatedUser);
+        logger.info("User changed password: id={}, username={}", savedUser.getId(), savedUser.getUsername());
+        return savedUser;
     }
 
     public List<User> getUsersFiltered(Long restaurantId, User.Role role, User.Status status, String cityName, String username, String email) {
-        return repository.findAll(
+        return userRepository.findAll(
                 UserSpecification.filter(
                         restaurantId, role, status, cityName, username, email
                 )
@@ -128,7 +143,9 @@ public class UserService {
         City city = cityRepository.findById(cityId)
                 .orElseThrow(() -> new NotFoundException("City", "id", cityId));
         user.setCity(city);
-        return repository.save(user);
+        User savedUser = userRepository.save(user);
+        logger.info("User city changed: id={}, username={}, newCity={}", savedUser.getId(), savedUser.getUsername(), city.getName());
+        return savedUser;
     }
 
     public User changeStatus(Long userId, User.Status newStatus) {
@@ -136,7 +153,9 @@ public class UserService {
         if (user.getRole() == User.Role.ADMIN)
             throw new IllegalOperationException("Cannot block an admin");
         user.setStatus(newStatus);
-        return repository.save(user);
+        User savedUser = userRepository.save(user);
+        logger.info("User status changed: id={}, username={}, newStatus={}", savedUser.getId(), savedUser.getUsername(), newStatus);
+        return savedUser;
     }
 
     private void validatePassword(String password) {
@@ -158,7 +177,7 @@ public class UserService {
     }
 
     private void validateUsernameUnique(Long id, String username) {
-        repository.findByUsername(username).ifPresent(existingUser -> {
+        userRepository.findByUsername(username).ifPresent(existingUser -> {
             if (id == null || !Objects.equals(existingUser.getId(), id)) {
                 throw new IllegalOperationException("Username already used.");
             }
@@ -166,7 +185,7 @@ public class UserService {
     }
 
     private void validateEmailUnique(Long id, String email) {
-        repository.findByEmail(email).ifPresent(existingUser -> {
+        userRepository.findByEmail(email).ifPresent(existingUser -> {
             if (!Objects.equals(existingUser.getId(), id)) {
                 throw new IllegalOperationException("Email already used.");
             }
