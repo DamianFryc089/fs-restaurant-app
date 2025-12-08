@@ -4,6 +4,7 @@ package fun.kociarnia.bazy_danych_projekt.user;
 import fun.kociarnia.bazy_danych_projekt.city.City;
 import fun.kociarnia.bazy_danych_projekt.city.CityRepository;
 import fun.kociarnia.bazy_danych_projekt.exception.NotFoundException;
+import fun.kociarnia.bazy_danych_projekt.exception.WeakPasswordException;
 import fun.kociarnia.bazy_danych_projekt.restaurant.RestaurantRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,5 +92,20 @@ class UserServiceTest {
         verify(userRepository, times(0)).save(any(User.class));
     }
 
+    @Test
+    void changePasswordShouldThrowWhenWeakPassword() {
+        User existing = new User();
+        existing.setId(9L);
+        existing.setPassword("oldStrong1@");
+
+        try {
+            userService.changePassword(9L, "abc");
+        } catch (WeakPasswordException e) {
+            assertEquals(4, e.getErrors().size());
+        }
+
+        verify(userRepository, times(0)).findById(9L);
+        verify(userRepository, times(0)).save(any());
+    }
 }
 

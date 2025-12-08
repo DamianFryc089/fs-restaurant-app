@@ -2,6 +2,7 @@ package fun.kociarnia.bazy_danych_projekt.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fun.kociarnia.bazy_danych_projekt.user.dto.CreateUserDTO;
+import fun.kociarnia.bazy_danych_projekt.user.dto.UserDTO;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.MediaType;
@@ -11,12 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@ActiveProfiles("local")
 @Transactional
 @AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
@@ -68,6 +67,46 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("test1"))
                 .andExpect(jsonPath("$.email").value("test@test.com"));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser", roles = {"ADMIN"})
+    void shouldUpdateUserByAdmin() throws Exception {
+        UserDTO dto = new UserDTO();
+        dto.setId(5L);
+        dto.setUsername("nowy1");
+        dto.setEmail("nowy@test.com");
+        dto.setRole("CLIENT");
+        dto.setStatus("ACTIVE");
+        dto.setCityName("Kraków");
+        dto.setRestaurantId(99L);
+
+        User updated = new User();
+        updated.setId(5L);
+        updated.setUsername("zmienony1");
+        updated.setEmail("nowyemail@test.com");
+
+        when(userService.updateUserAdmin(Mockito.eq(5L), any(User.class),
+                Mockito.eq("Kraków"), Mockito.eq(99L)))
+                .thenReturn(updated);
+
+        mockMvc.perform(post("/users/admin/5")
+                        .contentType(String.valueOf(MediaType.APPLICATION_JSON))
+                        .content(new ObjectMapper().writeValueAsString(dto))
+                        .with(req -> {
+                            req.setMethod("PUT");
+                            return req;
+                        }))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(5))
+                .andExpect(jsonPath("$.username").value("zmienony1"))
+                .andExpect(jsonPath("$.email").value("nowyemail@test.com"));
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenNotAdminOnGetUsers() throws Exception {
+        mockMvc.perform(get("/users"))
+                .andExpect(status().is5xxServerError());
     }
 }
 

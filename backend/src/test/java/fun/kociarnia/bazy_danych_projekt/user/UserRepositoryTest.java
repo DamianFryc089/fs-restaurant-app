@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
 @ActiveProfiles("local")
@@ -53,6 +54,25 @@ class UserRepositoryTest {
         assertEquals("usere", employees.get(1).getUsername());
     }
 
+    @Test
+    void shouldReturnEmptyWhenUsernameNotFound() {
+        assertFalse(userRepository.findByUsername("nonexistent").isPresent());
+    }
+
+    @Test
+    void shouldFindUserByEmail() {
+        User user = new User();
+        user.setUsername("emailUser");
+        user.setEmail("email@example.com");
+        user.setPassword("password");
+        user.setRole(User.Role.CLIENT);
+
+        userRepository.save(user);
+
+        User found = userRepository.findByEmail("email@example.com").orElseThrow();
+        assertEquals("emailUser", found.getUsername());
+    }
+
     private User createUser(String base, User.Role role) {
         User u = new User();
         u.setUsername(base);
@@ -61,5 +81,6 @@ class UserRepositoryTest {
         u.setRole(role);
         return u;
     }
+
 }
 
