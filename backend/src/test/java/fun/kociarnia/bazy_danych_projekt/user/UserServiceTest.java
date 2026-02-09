@@ -94,10 +94,6 @@ class UserServiceTest {
 
     @Test
     void changePasswordShouldThrowWhenWeakPassword() {
-        User existing = new User();
-        existing.setId(9L);
-        existing.setPassword("oldStrong1@");
-
         try {
             userService.changePassword(9L, "abc");
         } catch (WeakPasswordException e) {

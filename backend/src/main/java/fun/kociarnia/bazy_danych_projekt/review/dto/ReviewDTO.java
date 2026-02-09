@@ -37,7 +37,7 @@ public class ReviewDTO {
         ReviewDTO dto = new ReviewDTO();
         dto.setId(review.getId());
         dto.setOrderId(review.getOrder().getId());
-        dto.setUsername(review.isAnonymous() ? "anonymoys" : review.getOrder().getClient().getUsername());
+        dto.setUsername(review.isAnonymous() ? "anonymous" : review.getOrder().getClient().getUsername());
         dto.setRating(review.getRating());
         dto.setComment(review.getComment());
         dto.setCreatedAt(review.getCreatedAt());

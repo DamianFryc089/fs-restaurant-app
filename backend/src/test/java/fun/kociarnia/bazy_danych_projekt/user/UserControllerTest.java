@@ -106,7 +106,7 @@ class UserControllerTest {
     @Test
     void shouldReturnForbiddenWhenNotAdminOnGetUsers() throws Exception {
         mockMvc.perform(get("/users"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isForbidden());
     }
 }
 

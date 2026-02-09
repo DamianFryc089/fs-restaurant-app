@@ -20,8 +20,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     return (
         <form onSubmit={handleSubmit}>
             <div>
-                <label>Username:</label>
+                <label htmlFor="loginUsername">Username:</label>
                 <input
+                    id="loginUsername"
                     type="text"
                     name="username"
                     value={form.username}
@@ -29,8 +30,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
                 />
             </div>
             <div>
-                <label>Password:</label>
+                <label htmlFor="loginPassword">Password:</label>
                 <input
+                    id="loginPassword"
                     type="password"
                     name="password"
                     value={form.password}

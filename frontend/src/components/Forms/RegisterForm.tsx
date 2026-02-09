@@ -29,18 +29,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, initialDat
             {!initialData &&
                 <>
                     <div>
-                        <label>Username:</label>
-                        <input type="text" name="username" value={form.username} onChange={handleChange} required />
+                        <label htmlFor="registerUsername">Username:</label>
+                        <input id="registerUsername" type="text" name="username" value={form.username} onChange={handleChange} required />
                     </div>
                     <div>
-                        <label>Email:</label>
-                        <input type="email" name="email" value={form.email} onChange={handleChange} required />
+                        <label htmlFor="registerEmail">Email:</label>
+                        <input id="registerEmail" type="email" name="email" value={form.email} onChange={handleChange} required />
                     </div>
                 </>
             }
             <div>
-                <label>Password:</label>
-                <input type="password" name="password" value={form.password} onChange={handleChange} required minLength={8} />
+                <label htmlFor="registerPassword">Password:</label>
+                <input id="registerPassword" type="password" name="password" value={form.password} onChange={handleChange} required minLength={8} />
             </div>
             { !initialData && <button type="submit">Register</button>}
             { initialData && <button type="submit">Change Password</button>}

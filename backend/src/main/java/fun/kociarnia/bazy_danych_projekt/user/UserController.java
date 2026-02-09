@@ -33,6 +33,13 @@ public class UserController {
         return UserDTO.fromEntityList(users);
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserDTO getUserById(@PathVariable Long id) {
+        User user = service.getUserById(id);
+        return UserDTO.fromEntity(user);
+    }
+
     @PostMapping
     public UserDTO createUser(@Valid @RequestBody CreateUserDTO dto) {
         User user = service.createUser(CreateUserDTO.toEntity(dto));
